@@ -1,0 +1,103 @@
+#include "WPILib.h"
+#include "NetworkTables/NetworkTable.h"
+class Robot: public IterativeRobot
+{
+public:
+	Joystick *controller1,*controller2;
+	CANTalon *driveTrainR1, *driveTrainR2,*driveTrainL1, *driveTrainL2, *shootertalon1, *shootertalon2, *drumintaketalon;
+	Compressor *compressor;
+	NetworkTable *table;
+	int auton = 0;
+	int autonMax = 5;
+
+	Robot(){
+		table = NetworkTable::GetTable("datatable");
+		//controls
+		controller1 = new Joystick(1);
+		controller2 = new Joystick(2);
+		//Right Drive Train
+		driveTrainR1 = new CANTalon(1);
+		driveTrainR2 = new CANTalon(2);
+
+		//Left Drive Train
+		driveTrainL1 = new CANTalon(3);
+		driveTrainL2 = new CANTalon(4);
+
+		//shooter Talons
+		shootertalon1 = new CANTalon(5);
+		shootertalon2 = new CANTalon(6);
+		//intake talon
+		drumintaketalon = new CANTalon(7);
+		compressor = new Compressor(0);
+	}
+	void OperatorControl (){
+		double x = 0;
+		double y = 0;
+		while (IsOperatorControl() && IsEnabled())
+			Wait(1.0);
+			table->PutNumber("X", x);
+			table->PutNumber("Y", y);
+			x += 0.25;
+			y += 0.25;
+			}
+	void RobotInit()
+	{
+		compressor->SetClosedLoopControl(true);
+		CameraServer::GetInstance()->SetQuality(50);
+		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
+		//Not Nothing, Compressor, yay!
+	}
+
+	void AutonomousInit()
+	{
+		if(auton == 0)
+		{
+			SmartDashboard::PutString("DB/String 6","GOTTA GO FAST(drive forward 7 seconds .75 power");
+		}
+
+		if (auton == 0)
+		{
+			driveTrainR1->Set(.75);
+			driveTrainR2->Set(.75);
+			driveTrainL1->Set(-.75);
+			driveTrainL2->Set(-.75);
+
+			Wait(7);
+
+			driveTrainR1->Set(0);
+			driveTrainR2->Set(0);
+			driveTrainL1->Set(0);
+			driveTrainL2->Set(0);
+		}
+	}
+	void TeleopPeriodic(){
+		TankDrive(controller1->GetRawAxis(5), controller1->GetRawAxis(1));
+
+		(controller2->GetRawButton(1));
+			{
+				shootertalon1->Set(1);
+				shootertalon2->Set(-1);
+			}
+		(controller2->GetRawButton(2));
+		{
+			shootertalon1->Set(-1);
+			shootertalon2->Set(1);
+		}
+		 (controller2->GetRawButton(5));
+			{
+				drumintaketalon->Set(1);
+			}
+		(controller2->GetRawButton(4));
+				drumintaketalon->Set(-1);
+			}
+	void TankDrive(double left, double right)
+		{
+			driveTrainR1->Set(-left);
+			driveTrainR2->Set(-left);
+
+			driveTrainL1->Set(right);
+			driveTrainL2->Set(right);
+		}
+};
+
+START_ROBOT_CLASS(Robot)
