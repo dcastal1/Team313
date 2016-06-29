@@ -6,7 +6,7 @@ public:
 	Joystick *controller1,*controller2;
 	CANTalon *driveTrainR1, *driveTrainR2,*driveTrainL1, *driveTrainL2, *shootertalon1, *shootertalon2, *drumintaketalon;
 	Compressor *compressor;
-	NetworkTable *table;
+	std::shared_ptr<NetworkTable> table;
 	int auton = 0;
 	int autonMax = 5;
 
@@ -30,16 +30,19 @@ public:
 		drumintaketalon = new CANTalon(7);
 		compressor = new Compressor(0);
 	}
-	void OperatorControl (){
+	void OperatorControl ()
+	{
 		double x = 0;
 		double y = 0;
 		while (IsOperatorControl() && IsEnabled())
+		{
 			Wait(1.0);
 			table->PutNumber("X", x);
 			table->PutNumber("Y", y);
 			x += 0.25;
 			y += 0.25;
-			}
+		}
+	}
 	void RobotInit()
 	{
 		compressor->SetClosedLoopControl(true);
