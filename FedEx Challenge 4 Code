@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <math.h>
+#define npl 4.44822  //  Newtons/lbs
+double friction(double U, double R);
+
+int main()
+{
+    double V_mph=0, V_fts;
+    printf("How fast will you travel (mph)?   ");
+    scanf("%lf",&V_mph);
+
+    V_fts = V_mph*5280/3600;
+
+    int n_students = 0;
+    printf("How many students?   ");
+    scanf("%d",&n_students);
+    double Wstudent=0;
+    printf("Average student weight (lbs)?   ");
+    scanf("%lf",&Wstudent);
+
+    double Wbolt=3580;
+    double W_empty=200;
+    double W_load=250+150;    //lbs
+    double W_car=n_students*Wstudent+Wbolt;
+    double W_trailer=W_empty+W_load;
+    double Uk=0.02;
+    double f_car=4*friction(Uk,W_car/4);//number of wheels*friction/wheel
+    double f_trailer=2*friction(Uk,W_trailer/2);
+    double f_total=f_car+f_trailer;
+    printf("\nVelocity: %.0f [mph] = %.2f [ft/s] = %.2f [m/s]\n",V_mph, V_fts, V_fts*0.3048);
+    printf("\nFriction from car: %.2f [lbs] = %.2f [N]\nFriction from trailer: %.2f [lbs] = %.2f [N]\nTotal friction: %.2f [lbs] = %.2f [N]\n",f_car,f_car*npl,f_trailer,f_trailer*npl,f_total,f_total*npl);
+
+    double density=0.002327;/*slug/ft^3*/
+    double coef_drag=0.32;
+    double w=62.8;/*in*/
+    double h=69.5;/*in*/
+    double A=w*h/pow(12,2);//makes in^2 ft^2
+    double F_ar=density*coef_drag*A/2*pow(V_fts,2);
+    printf("Force from air resistance:  %.2f [lbs] = %.2f [N]\n",F_ar*npl);
+
+    double Distance_mi=400;
+    double distance_ft=Distance_mi*5280;
+
+    double mass_car=W_car/32.2,mass_trailer=W_trailer/32.2,m=mass_car+mass_trailer;
+    double E = m/2*pow(V_fts,2)+f_total*distance_ft+F_ar*distance_ft;  //slug*ft^2/s^2
+
+    double t=Distance_mi/V_mph*3600;
+
+    double p = E/t; //  slug*ft^2/s^3
+    double p_watt = p*14.5939029/*kg/slug*/*pow(0.3048/*m/ft*/,2);//converts from English to metric
+
+    //answer 1
+    printf("\n\nAnswers:\n  Part 1. Power need for round trip is:\n        %.8f [W] = %.4f [kW]\n\n",p_watt,p_watt/1000);
+
+    double E_metric=p_watt*t/1000; //   kj
+    double price=0.12/3600; //  $0.012/kw-s=kj
+    double cost=E_metric*price;
+
+    //Answer 2
+    printf("    Part 2. Cost for round trip at $.12/kWh:\n        $%.2f\n", cost);
+
+    return 0;
+}
+
+double friction(double U, double R)
+{
+    double f=U*R;
+    return f;
+}
