@@ -1,0 +1,14 @@
+- FRCUpdate2015.1.0.zip should have all update software (PDP-Application-1.40-EnergyFix.zip is not required)
+- Updates should be found in C:\Users\Public\Documents\FRC after FRC Update installation
+- Open a browser and type in the roborio's ping (or roboRIO-313.local) to get to where it says "Update Firmware" for each thing
+
+
+---What the versions need to be---
+PDP Firmware: 1.37 or 1.40
+PCM Firmware: 1.62
+RoboRIO Firmware: 2.1.0f3
+RoboRIO Image: v23 (This should already match)
+
+-roboRIO firmware should be located in: Program Files(x86)\National Instruments\Shared\Firmware\cRIO\76F2\
+
+-(just in case, the roboRIO Imaging Tool is located in  C:\Program Files (x86)\National Instruments\LabVIEW 2014\project\roboRIO Tool
